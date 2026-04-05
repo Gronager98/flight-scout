@@ -5,442 +5,82 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flight Scout · CPH</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #f5f3ee;
-    --surface: #ffffff;
-    --border: #e2ddd6;
-    --text: #1a1714;
-    --muted: #7a7570;
-    --accent: #1a4a3a;
-    --accent-light: #e8f0ec;
-    --deal: #0f5c2e;
-    --deal-bg: #e6f4ec;
-    --warn: #8a4a00;
-    --warn-bg: #fdf0e0;
-    --tag-bg: #ede9e2;
-    --mono: 'DM Mono', monospace;
-    --serif: 'Fraunces', Georgia, serif;
+    --bg: #f5f3ee; --surface: #ffffff; --border: #e2ddd6;
+    --text: #1a1714; --muted: #7a7570; --accent: #1a4a3a;
+    --accent-light: #e8f0ec; --deal-color: #0f5c2e; --deal-bg: #e6f4ec;
+    --tag-bg: #ede9e2; --mono: 'DM Mono', monospace; --serif: 'Fraunces', Georgia, serif;
   }
-
-  body {
-    font-family: var(--mono);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 13px;
-  }
-
-  header {
-    padding: 2rem 2rem 0;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .site-label {
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.5rem;
-  }
-
-  h1 {
-    font-family: var(--serif);
-    font-weight: 300;
-    font-size: 2.2rem;
-    color: var(--text);
-    line-height: 1.1;
-    margin-bottom: 0.25rem;
-  }
-
+  body { font-family: var(--mono); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 13px; }
+  header { padding: 2rem 2rem 0; max-width: 900px; margin: 0 auto; }
+  .site-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: 2.2rem; color: var(--text); line-height: 1.1; margin-bottom: 0.25rem; }
   h1 em { font-style: italic; color: var(--accent); }
-
-  .subtitle {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 1.5rem;
-  }
-
-  .api-setup {
-    background: var(--warn-bg);
-    border: 1px solid #f0d08a;
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.5rem;
-    font-size: 12px;
-  }
-
-  .api-setup strong { color: var(--warn); }
-
-  .api-setup input {
-    margin-top: 0.5rem;
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #f0d08a;
-    border-radius: 6px;
-    background: #fff;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text);
-    outline: none;
-  }
-
-  .api-setup input:focus { border-color: var(--accent); }
-
-  .controls {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-  }
-
-  .tabs {
-    display: flex;
-    gap: 2px;
-    background: var(--border);
-    border-radius: 8px;
-    padding: 2px;
-  }
-
-  .tab {
-    padding: 0.4rem 1rem;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .tab.active {
-    background: var(--surface);
-    color: var(--text);
-  }
-
-  .btn-refresh {
-    padding: 0.4rem 1rem;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
+  .subtitle { font-size: 12px; color: var(--muted); margin-bottom: 1.5rem; }
+  .controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .tabs { display: flex; gap: 2px; background: var(--border); border-radius: 8px; padding: 2px; }
+  .tab { padding: 0.4rem 1rem; border-radius: 6px; border: none; background: transparent; font-family: var(--mono); font-size: 12px; color: var(--muted); cursor: pointer; }
+  .tab.active { background: var(--surface); color: var(--text); }
+  .btn-refresh { padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); font-family: var(--mono); font-size: 12px; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 0.4rem; }
   .btn-refresh:hover { background: var(--accent-light); border-color: var(--accent); }
   .btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .status-bar {
-    font-size: 11px;
-    color: var(--muted);
-    margin-left: auto;
-  }
-
-  main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 2rem 4rem;
-  }
-
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* Watchlist editor */
-  .watchlist-editor {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .watchlist-editor h3 {
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.75rem;
-  }
-
-  .watchlist-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto auto;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-
-  .watchlist-row input, .watchlist-row select {
-    padding: 0.4rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text);
-    outline: none;
-  }
-
-  .watchlist-row input:focus, .watchlist-row select:focus {
-    border-color: var(--accent);
-  }
-
-  .btn-small {
-    padding: 0.35rem 0.6rem;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    cursor: pointer;
-  }
-
+  .status-bar { font-size: 11px; color: var(--muted); margin-left: auto; }
+  main { max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem; }
+  .panel { display: none; } .panel.active { display: block; }
+  .watchlist-editor { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  .watchlist-editor h3 { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+  .watchlist-row { display: grid; grid-template-columns: 1fr 80px 100px auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .watchlist-row input { padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-family: var(--mono); font-size: 12px; color: var(--text); outline: none; width: 100%; }
+  .watchlist-row input:focus { border-color: var(--accent); }
+  .btn-small { padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); background: transparent; font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer; }
   .btn-small:hover { border-color: #c0392b; color: #c0392b; }
-
-  .btn-add {
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    border: 1px dashed var(--border);
-    background: transparent;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    cursor: pointer;
-    margin-top: 4px;
-  }
-
+  .btn-add { padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px dashed var(--border); background: transparent; font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer; margin-top: 4px; }
   .btn-add:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* Cards grid */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 12px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.25rem;
-    transition: border-color 0.15s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .card:hover { border-color: #c8c0b8; }
-
-  .card.deal { border-color: #a8d5b8; }
-  .card.loading { opacity: 0.6; }
-
-  .card-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-  }
-
-  .destination {
-    font-family: var(--serif);
-    font-weight: 300;
-    font-size: 1.3rem;
-    color: var(--text);
-    line-height: 1.1;
-  }
-
-  .iata {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  .badge {
-    font-size: 9px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 3px 7px;
-    border-radius: 4px;
-    white-space: nowrap;
-  }
-
-  .badge.deal { background: var(--deal-bg); color: var(--deal); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; transition: border-color 0.15s; }
+  .card:hover { border-color: #c8c0b8; } .card.deal { border-color: #a8d5b8; } .card.loading { opacity: 0.6; }
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem; }
+  .destination { font-family: var(--serif); font-weight: 300; font-size: 1.3rem; color: var(--text); line-height: 1.1; }
+  .iata { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); margin-top: 2px; }
+  .badge { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; white-space: nowrap; }
+  .badge.deal { background: var(--deal-bg); color: var(--deal-color); }
   .badge.watch { background: var(--tag-bg); color: var(--muted); }
   .badge.discovery { background: #e8e4f0; color: #4a3a7a; }
   .badge.checking { background: var(--tag-bg); color: var(--muted); }
-
-  .price-row {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .price {
-    font-size: 1.6rem;
-    font-weight: 500;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
-  .price.deal { color: var(--deal); }
-
-  .currency {
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .saving {
-    font-size: 11px;
-    color: var(--deal);
-    margin-bottom: 0.5rem;
-  }
-
-  .dates {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 0.75rem;
-  }
-
-  .threshold-line {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 0.75rem;
-  }
-
-  .card-footer {
-    border-top: 1px solid var(--border);
-    padding-top: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .score-bar {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    flex: 1;
-    margin-right: 0.75rem;
-    overflow: hidden;
-  }
-
-  .score-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.5s ease;
-  }
-
-  .score-label {
-    font-size: 10px;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-
-  .btn-book {
-    display: inline-block;
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    border: 1px solid var(--accent);
-    background: transparent;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    text-decoration: none;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-
+  .price-row { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .price { font-size: 1.6rem; font-weight: 500; color: var(--text); letter-spacing: -0.02em; }
+  .price.deal { color: var(--deal-color); }
+  .currency { font-size: 11px; color: var(--muted); }
+  .saving { font-size: 11px; color: var(--deal-color); margin-bottom: 0.5rem; }
+  .dates { font-size: 11px; color: var(--muted); margin-bottom: 0.75rem; }
+  .threshold-line { font-size: 11px; color: var(--muted); margin-bottom: 0.75rem; }
+  .card-footer { border-top: 1px solid var(--border); padding-top: 0.75rem; display: flex; align-items: center; }
+  .score-bar { height: 3px; background: var(--border); border-radius: 2px; flex: 1; margin-right: 0.75rem; overflow: hidden; }
+  .score-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+  .score-label { font-size: 10px; color: var(--muted); white-space: nowrap; }
+  .btn-book { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--accent); background: transparent; font-family: var(--mono); font-size: 11px; color: var(--accent); text-decoration: none; white-space: nowrap; margin-left: 0.5rem; }
   .btn-book:hover { background: var(--accent); color: #fff; }
-
-  /* Error / empty states */
-  .empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--muted);
-    font-size: 12px;
-  }
-
-  .spinner {
-    display: inline-block;
-    width: 12px; height: 12px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
-  }
-
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 12px; }
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .error-msg {
-    background: #fef2f2;
-    border: 1px solid #fca5a5;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    font-size: 12px;
-    color: #991b1b;
-    margin-bottom: 1rem;
-  }
-
-  .section-label {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .discovery-note {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 1rem;
-    line-height: 1.5;
-  }
-
-  @media (max-width: 600px) {
-    header, main { padding-left: 1rem; padding-right: 1rem; }
-    .watchlist-row { grid-template-columns: 1fr 1fr auto auto; }
-    h1 { font-size: 1.6rem; }
-  }
+  .error-msg { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 0.75rem 1rem; font-size: 12px; color: #991b1b; margin-bottom: 1rem; }
+  .section-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .discovery-note { font-size: 11px; color: var(--muted); margin-bottom: 1rem; line-height: 1.5; }
+  @media (max-width: 600px) { header, main { padding-left: 1rem; padding-right: 1rem; } h1 { font-size: 1.6rem; } .watchlist-row { grid-template-columns: 1fr 70px 80px auto; } }
 </style>
 </head>
 <body>
-
 <header>
   <div class="site-label">Flight Scout · Copenhagen CPH</div>
   <h1>Where should you go <em>next?</em></h1>
   <p class="subtitle">Live flight prices · refreshes on demand</p>
-
-  <div class="api-setup" id="apiSetup">
-    <strong>Setup:</strong> Paste your SerpApi key to activate live prices.
-    <input type="password" id="apiKeyInput" placeholder="Paste your SerpApi key here…" autocomplete="off">
-    <div style="margin-top:0.5rem;display:flex;gap:0.5rem">
-      <button class="btn-small" style="border-color:var(--accent);color:var(--accent)" onclick="saveKey()">Save key</button>
-      <span style="font-size:11px;color:var(--muted);align-self:center">Stored locally in your browser only</span>
-    </div>
-  </div>
-
   <div class="controls">
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('watchlist')">Watchlist</button>
-      <button class="tab" onclick="switchTab('discovery')">Discoveries</button>
+      <button class="tab active" onclick="switchTab('watchlist', this)">Watchlist</button>
+      <button class="tab" onclick="switchTab('discovery', this)">Discoveries</button>
     </div>
     <button class="btn-refresh" id="refreshBtn" onclick="refresh()">
       <span id="spinnerEl" style="display:none" class="spinner"></span>
@@ -449,11 +89,8 @@
     <span class="status-bar" id="statusBar">—</span>
   </div>
 </header>
-
 <main>
   <div id="errorEl"></div>
-
-  <!-- Watchlist panel -->
   <div class="panel active" id="watchlistPanel">
     <div class="watchlist-editor">
       <h3>Your watchlist</h3>
@@ -461,52 +98,33 @@
       <button class="btn-add" onclick="addRow()">+ Add destination</button>
     </div>
     <div class="section-label">Current prices</div>
-    <div class="grid" id="watchlistGrid">
-      <div class="empty-state">Add destinations above, then click "Fetch prices"</div>
-    </div>
+    <div class="grid" id="watchlistGrid"><div class="empty-state">Add destinations above, then click "Fetch prices"</div></div>
   </div>
-
-  <!-- Discovery panel -->
   <div class="panel" id="discoveryPanel">
-    <p class="discovery-note">
-      Showing the best-value destinations available from CPH right now — ranked by price vs excitement.
-      Click "Fetch prices" to refresh.
-    </p>
+    <p class="discovery-note">Best-value destinations from CPH right now — ranked by price vs excitement. Click "Fetch prices" to refresh.</p>
     <div class="section-label">Top deals right now</div>
-    <div class="grid" id="discoveryGrid">
-      <div class="empty-state">Click "Fetch prices" to discover deals</div>
-    </div>
+    <div class="grid" id="discoveryGrid"><div class="empty-state">Click "Fetch prices" to discover deals</div></div>
   </div>
 </main>
-
 <script>
-const ORIGIN = 'CPH';
-const STORAGE_KEY = 'flightScout_v1';
+// ── Set this to your Vercel URL after deploying ──
+const API_BASE = 'https://YOUR-PROJECT.vercel.app/api/flights';
 
+const ORIGIN = 'CPH';
+const STORAGE_KEY = 'flightScout_v2';
 const EXCITEMENT = {
-  TBS:30,EVN:25,SKP:20,OHD:20,PRN:15,SOF:15,TIA:15,BEG:20,
-  AGP:20,PMI:18,OPO:22,LIS:25,ATH:22,HER:18,RHO:18,SPU:20,DBV:25,TGD:22,
-  FCO:20,BCN:22,MAD:20,VIE:18,PRG:18,BUD:18,WAW:12,KRK:15,RAK:28,CMN:25,
-  BKK:35,HAN:32,SGN:32,CMB:30,KTM:35,JNB:30,NBO:28,GRU:25,MEX:28,BOG:25,
-  DXB:15,IST:20,AMS:10,CDG:10,MXP:12,NAP:18,KEF:22,RVK:20,
+  TBS:30,EVN:25,SKP:20,SOF:15,TIA:15,BEG:20,AGP:20,PMI:18,OPO:22,LIS:25,
+  ATH:22,HER:18,RHO:18,SPU:20,DBV:25,TGD:22,FCO:20,BCN:22,MAD:20,VIE:18,
+  PRG:18,BUD:18,WAW:12,KRK:15,RAK:28,CMN:25,BKK:35,HAN:32,SGN:32,CMB:30,
+  KTM:35,JNB:30,NBO:28,GRU:25,MEX:28,BOG:25,DXB:15,IST:20,AMS:10,NAP:18,KEF:22,
 };
 
-let state = load();
-
-function load() {
+let state = (() => {
   try {
     const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    return {
-      apiKey: s.apiKey || '',
-      watchlist: s.watchlist || defaultWatchlist(),
-      lastUpdated: s.lastUpdated || null,
-      watchResults: s.watchResults || [],
-      discoverResults: s.discoverResults || [],
-    };
-  } catch(e) { return { apiKey:'', watchlist: defaultWatchlist(), lastUpdated:null, watchResults:[], discoverResults:[] }; }
-}
-
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    return { watchlist: s.watchlist || defaultWatchlist(), lastUpdated: s.lastUpdated || null, watchResults: s.watchResults || [], discoverResults: s.discoverResults || [] };
+  } catch(e) { return { watchlist: defaultWatchlist(), lastUpdated: null, watchResults: [], discoverResults: [] }; }
+})();
 
 function defaultWatchlist() {
   return [
@@ -515,241 +133,149 @@ function defaultWatchlist() {
     { name:'Athens', iata:'ATH', threshold:1400 },
     { name:'Bangkok', iata:'BKK', threshold:4500 },
     { name:'Tbilisi', iata:'TBS', threshold:2000 },
+    { name:'Dubrovnik', iata:'DBV', threshold:1600 },
   ];
 }
 
-function saveKey() {
-  const v = document.getElementById('apiKeyInput').value.trim();
-  if (!v) return;
-  state.apiKey = v;
-  save();
-  document.getElementById('apiSetup').style.display = 'none';
-  document.getElementById('apiKeyInput').value = '';
-  showStatus('API key saved.');
-}
-
-function switchTab(tab) {
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function switchTab(tab, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  event.target.classList.add('active');
+  el.classList.add('active');
   document.getElementById(tab + 'Panel').classList.add('active');
 }
-
 function showStatus(msg) { document.getElementById('statusBar').textContent = msg; }
-function showError(msg) {
-  const el = document.getElementById('errorEl');
-  el.innerHTML = msg ? `<div class="error-msg">${msg}</div>` : '';
-}
+function showError(msg) { document.getElementById('errorEl').innerHTML = msg ? `<div class="error-msg">${msg}</div>` : ''; }
 
 function renderWatchlistEditor() {
-  const container = document.getElementById('watchlistRows');
-  container.innerHTML = state.watchlist.map((d, i) => `
-    <div class="watchlist-row" id="wrow_${i}">
-      <input value="${d.name}" placeholder="City name" onchange="updateRow(${i},'name',this.value)">
-      <input value="${d.iata}" placeholder="IATA code" maxlength="3" style="text-transform:uppercase"
-             onchange="updateRow(${i},'iata',this.value.toUpperCase())">
-      <input type="number" value="${d.threshold}" placeholder="Max DKK" style="width:90px"
-             onchange="updateRow(${i},'threshold',+this.value)">
+  document.getElementById('watchlistRows').innerHTML = state.watchlist.map((d, i) => `
+    <div class="watchlist-row">
+      <input value="${d.name}" placeholder="City" onchange="updateRow(${i},'name',this.value)">
+      <input value="${d.iata}" placeholder="IATA" maxlength="3" style="text-transform:uppercase" onchange="updateRow(${i},'iata',this.value.toUpperCase())">
+      <input type="number" value="${d.threshold}" placeholder="Max DKK" onchange="updateRow(${i},'threshold',+this.value)">
       <button class="btn-small" onclick="removeRow(${i})">✕</button>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function updateRow(i, key, val) { state.watchlist[i][key] = val; save(); }
-function removeRow(i) { state.watchlist.splice(i,1); save(); renderWatchlistEditor(); }
-function addRow() {
-  state.watchlist.push({ name:'', iata:'', threshold:2000 });
-  save();
-  renderWatchlistEditor();
+function updateRow(i, k, v) { state.watchlist[i][k] = v; save(); }
+function removeRow(i) { state.watchlist.splice(i, 1); save(); renderWatchlistEditor(); }
+function addRow() { state.watchlist.push({ name:'', iata:'', threshold:2000 }); save(); renderWatchlistEditor(); }
+
+async function callProxy(params) {
+  const r = await fetch(API_BASE + '?' + new URLSearchParams(params));
+  if (!r.ok) throw new Error(`Server error ${r.status}`);
+  return r.json();
 }
 
-async function fetchFlightPrice(dest, outDate, retDate) {
-  const key = state.apiKey;
-  if (!key) throw new Error('No API key');
-  const url = `https://serpapi.com/search?engine=google_flights&departure_id=${ORIGIN}&arrival_id=${dest}&outbound_date=${outDate}&return_date=${retDate}&currency=DKK&hl=en&type=1&api_key=${key}`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`API error ${r.status}`);
-  const data = await r.json();
+async function fetchFlightPrice(dest, out, ret) {
+  const data = await callProxy({ engine:'google_flights', departure_id:ORIGIN, arrival_id:dest, outbound_date:out, return_date:ret, currency:'DKK', hl:'en', type:'1' });
   if (data.error) throw new Error(data.error);
   const prices = [];
-  for (const k of ['best_flights','other_flights']) {
-    for (const f of (data[k] || [])) { if (f.price) prices.push(f.price); }
-  }
+  for (const k of ['best_flights','other_flights']) for (const f of (data[k]||[])) if (f.price) prices.push(f.price);
   return prices.length ? Math.min(...prices) : null;
 }
 
 async function fetchDiscovery() {
-  const key = state.apiKey;
-  if (!key) throw new Error('No API key');
-  const url = `https://serpapi.com/search?engine=google_travel_explore&q=Flights+from+${ORIGIN}&currency=DKK&hl=en&api_key=${key}`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`API error ${r.status}`);
-  const data = await r.json();
+  const data = await callProxy({ engine:'google_travel_explore', q:`Flights from ${ORIGIN}`, currency:'DKK', hl:'en' });
   if (data.error) throw new Error(data.error);
-  return (data.destinations || []).slice(0, 24).map(item => ({
-    name: item.destination?.name || '—',
-    iata: item.destination?.iata_code || item.destination?.id || '',
-    price: item.price || null,
-    country: item.destination?.country || '',
-  })).filter(d => d.iata && d.price);
+  return (data.destinations||[]).slice(0,24).map(item => ({ name:item.destination?.name||'—', iata:item.destination?.iata_code||item.destination?.id||'', price:item.price||null, country:item.destination?.country||'' })).filter(d => d.iata && d.price);
 }
 
 function candidateDates() {
-  const pairs = [];
-  const today = new Date();
-  for (let daysOut = 7; daysOut <= 60; daysOut += 14) {
-    for (const len of [3, 5, 7]) {
-      const dep = new Date(today); dep.setDate(today.getDate() + daysOut);
-      const ret = new Date(dep);   ret.setDate(dep.getDate() + len);
-      pairs.push([dep.toISOString().slice(0,10), ret.toISOString().slice(0,10)]);
-    }
+  const pairs = [], today = new Date();
+  for (let d = 7; d <= 60; d += 14) for (const len of [3,5,7]) {
+    const dep = new Date(today); dep.setDate(today.getDate()+d);
+    const ret = new Date(dep);   ret.setDate(dep.getDate()+len);
+    pairs.push([dep.toISOString().slice(0,10), ret.toISOString().slice(0,10)]);
   }
   return pairs;
 }
 
-function excitementScore(iata, price, threshold) {
-  const valueScore = Math.max(0, Math.min(60, Math.round((1 - price/threshold)*60)));
-  const buzz = EXCITEMENT[iata.toUpperCase()] || 5;
-  return valueScore + buzz;
+function score(iata, price, threshold) {
+  return Math.max(0, Math.min(60, Math.round((1-price/threshold)*60))) + (EXCITEMENT[iata.toUpperCase()]||5);
 }
 
 function cardHtml(d) {
   const isDeal = d.price && d.threshold && d.price <= d.threshold;
-  const score = d.score || 0;
+  const s = d.score || 0;
   const bookUrl = `https://www.google.com/flights?q=flights+from+CPH+to+${d.iata}`;
-
   let priceHtml = '<span class="price" style="color:var(--muted)">—</span>';
   if (d.loading) priceHtml = '<span class="spinner"></span>';
-  else if (d.price) priceHtml = `<span class="price ${isDeal?'deal':''}">${d.price.toLocaleString('da-DK')}</span><span class="currency">DKK</span>`;
-
+  else if (d.price) priceHtml = `<span class="price ${isDeal?'deal':''}">${d.price.toLocaleString('da-DK')}</span><span class="currency">DKK return</span>`;
   const saving = isDeal ? d.threshold - d.price : 0;
-
-  return `
-    <div class="card ${isDeal?'deal':''} ${d.loading?'loading':''}">
-      <div class="card-header">
-        <div>
-          <div class="destination">${d.name}</div>
-          <div class="iata">${d.iata}${d.country ? ' · ' + d.country : ''}</div>
-        </div>
-        <span class="badge ${isDeal?'deal':d.type==='discovery'?'discovery':d.loading?'checking':'watch'}">
-          ${isDeal ? 'Deal' : d.loading ? '…' : d.type === 'discovery' ? 'Discovery' : 'Watching'}
-        </span>
-      </div>
-      <div class="price-row">${priceHtml}</div>
-      ${isDeal ? `<div class="saving">Saves ${saving.toLocaleString('da-DK')} DKK vs your limit</div>` : ''}
-      ${d.dates ? `<div class="dates">${d.dates}</div>` : ''}
-      ${d.threshold && !d.loading ? `<div class="threshold-line">Your limit: ${d.threshold.toLocaleString('da-DK')} DKK</div>` : ''}
-      <div class="card-footer">
-        <div class="score-bar"><div class="score-fill" style="width:${Math.min(100,score)}%"></div></div>
-        <span class="score-label">${score}/100</span>
-        &nbsp;
-        <a href="${bookUrl}" target="_blank" class="btn-book">Search →</a>
-      </div>
-    </div>`;
+  return `<div class="card ${isDeal?'deal':''} ${d.loading?'loading':''}">
+    <div class="card-header">
+      <div><div class="destination">${d.name}</div><div class="iata">${d.iata}${d.country?' · '+d.country:''}</div></div>
+      <span class="badge ${isDeal?'deal':d.type==='discovery'?'discovery':d.loading?'checking':'watch'}">${isDeal?'Deal':d.loading?'…':d.type==='discovery'?'Discovery':'Watching'}</span>
+    </div>
+    <div class="price-row">${priceHtml}</div>
+    ${isDeal?`<div class="saving">Saves ${saving.toLocaleString('da-DK')} DKK vs your limit</div>`:''}
+    ${d.dates&&!d.loading?`<div class="dates">${d.dates}</div>`:''}
+    ${d.threshold&&!d.loading&&!isDeal?`<div class="threshold-line">Your limit: ${d.threshold.toLocaleString('da-DK')} DKK</div>`:''}
+    <div class="card-footer">
+      <div class="score-bar"><div class="score-fill" style="width:${Math.min(100,s)}%"></div></div>
+      <span class="score-label">${s}/100</span>
+      <a href="${bookUrl}" target="_blank" class="btn-book">Search →</a>
+    </div>
+  </div>`;
 }
 
-function renderGrid(gridId, items) {
-  const el = document.getElementById(gridId);
-  if (!items.length) {
-    el.innerHTML = '<div class="empty-state">No results yet.</div>';
-    return;
-  }
-  el.innerHTML = items.map(cardHtml).join('');
+function renderGrid(id, items) {
+  document.getElementById(id).innerHTML = items.length ? items.map(cardHtml).join('') : '<div class="empty-state">No results yet.</div>';
 }
 
 async function refresh() {
-  if (!state.apiKey) {
-    showError('Please add your SerpApi key first.');
-    document.getElementById('apiSetup').style.display = 'block';
-    return;
-  }
   showError('');
-
   const btn = document.getElementById('refreshBtn');
-  const spinner = document.getElementById('spinnerEl');
-  const label = document.getElementById('refreshLabel');
   btn.disabled = true;
-  spinner.style.display = 'inline-block';
-  label.textContent = 'Fetching…';
+  document.getElementById('spinnerEl').style.display = 'inline-block';
+  document.getElementById('refreshLabel').textContent = 'Fetching…';
 
   const dates = candidateDates();
-
-  // --- Watchlist ---
-  const watchItems = state.watchlist
-    .filter(d => d.iata && d.name)
-    .map(d => ({ ...d, loading: true, type: 'watchlist', score: 0 }));
-
+  const watchItems = state.watchlist.filter(d => d.iata && d.name).map(d => ({ ...d, loading:true, type:'watchlist', score:0 }));
   renderGrid('watchlistGrid', watchItems);
   showStatus('Checking watchlist…');
 
   for (let i = 0; i < watchItems.length; i++) {
     const d = watchItems[i];
     let bestPrice = null, bestDates = null;
-    for (const [out, ret] of dates.slice(0, 4)) {
+    for (const [out, ret] of dates.slice(0,4)) {
       try {
         const p = await fetchFlightPrice(d.iata, out, ret);
         if (p && (!bestPrice || p < bestPrice)) { bestPrice = p; bestDates = `${out} → ${ret}`; }
       } catch(e) { console.warn(e); }
     }
-    watchItems[i] = {
-      ...d,
-      price: bestPrice,
-      dates: bestDates,
-      loading: false,
-      score: bestPrice ? excitementScore(d.iata, bestPrice, d.threshold) : 0,
-    };
+    watchItems[i] = { ...d, price:bestPrice, dates:bestDates, loading:false, score:bestPrice?score(d.iata,bestPrice,d.threshold):0 };
     renderGrid('watchlistGrid', [...watchItems]);
+    showStatus(`Checked ${i+1}/${watchItems.length}…`);
   }
 
   state.watchResults = watchItems;
   showStatus('Watchlist done. Discovering…');
 
-  // --- Discovery ---
   try {
     const raw = await fetchDiscovery();
     const watchIatas = new Set(state.watchlist.map(d => d.iata.toUpperCase()));
-    const discThreshold = 2500;
-    const discItems = raw
-      .filter(d => !watchIatas.has(d.iata.toUpperCase()))
-      .map(d => ({
-        ...d,
-        threshold: discThreshold,
-        type: 'discovery',
-        loading: false,
-        score: excitementScore(d.iata, d.price, discThreshold),
-        dates: 'Flexible',
-      }))
-      .filter(d => d.score >= 20)
-      .sort((a,b) => b.score - a.score)
-      .slice(0, 12);
+    const threshold = 2500;
+    const disc = raw.filter(d => !watchIatas.has(d.iata.toUpperCase()))
+      .map(d => ({ ...d, threshold, type:'discovery', loading:false, score:score(d.iata,d.price,threshold), dates:'Flexible' }))
+      .filter(d => d.score >= 20).sort((a,b) => b.score-a.score).slice(0,12);
+    state.discoverResults = disc;
+    renderGrid('discoveryGrid', disc);
+  } catch(e) { console.warn('Discovery failed:', e); }
 
-    state.discoverResults = discItems;
-    renderGrid('discoveryGrid', discItems);
-  } catch(e) {
-    console.warn('Discovery failed:', e);
-    renderGrid('discoveryGrid', []);
-  }
-
-  const now = new Date().toLocaleTimeString('da-DK', {hour:'2-digit',minute:'2-digit'});
-  state.lastUpdated = now;
-  save();
+  const now = new Date().toLocaleTimeString('da-DK', { hour:'2-digit', minute:'2-digit' });
+  state.lastUpdated = now; save();
   showStatus(`Last updated ${now}`);
   btn.disabled = false;
-  spinner.style.display = 'none';
-  label.textContent = 'Fetch prices';
+  document.getElementById('spinnerEl').style.display = 'none';
+  document.getElementById('refreshLabel').textContent = 'Fetch prices';
 }
 
-// Init
-(function init() {
-  if (state.apiKey) document.getElementById('apiSetup').style.display = 'none';
-  else document.getElementById('apiKeyInput').value = '';
-
-  renderWatchlistEditor();
-
-  if (state.watchResults.length) renderGrid('watchlistGrid', state.watchResults);
-  if (state.discoverResults.length) renderGrid('discoveryGrid', state.discoverResults);
-  if (state.lastUpdated) showStatus(`Last updated ${state.lastUpdated}`);
-})();
+renderWatchlistEditor();
+if (state.watchResults.length) renderGrid('watchlistGrid', state.watchResults);
+if (state.discoverResults.length) renderGrid('discoveryGrid', state.discoverResults);
+if (state.lastUpdated) showStatus(`Last updated ${state.lastUpdated}`);
 </script>
 </body>
 </html>
