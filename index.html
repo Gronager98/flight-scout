@@ -108,6 +108,250 @@
 </main>
 <script>
 // ── Set this to your Vercel URL after deploying ──
+const API_BASE = 'https://flight-scout-a7bno38m0-gronager98s-projects.vercel.app/api/flights';
+
+const ORIGIN = 'CPH';
+const STORAGE_KEY = 'flightScout_v2';
+const EXCITEMENT = {
+  TBS:30,EVN:25,SKP:20,SOF:15,TIA:15,BEG:20,AGP:20,PMI:18,OPO:22,LIS:25,
+  ATH:22,HER:18,RHO:18,SPU:20,DBV:25,TGD:22,FCO:20,BCN:22,MAD:20,VIE:18,
+  PRG:18,BUD:18,WAW:12,KRK:15,RAK:28,CMN:25,BKK:35,HAN:32,SGN:32,CMB:30,
+  KTM:35,JNB:30,NBO:28,GRU:25,MEX:28,BOG:25,DXB:15,IST:20,AMS:10,NAP:18,KEF:22,
+};
+
+let state = (() => {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    return { watchlist: s.watchlist || defaultWatchlist(), lastUpdated: s.lastUpdated || null, watchResults: s.watchResults || [], discoverResults: s.discoverResults || [] };
+  } catch(e) { return { watchlist: defaultWatchlist(), lastUpdated: null, watchResults: [], discoverResults: [] }; }
+})();
+
+function defaultWatchlist() {
+  return [
+    { name:'Lisbon', iata:'LIS', threshold:1800 },
+    { name:'Marrakech', iata:'RAK', threshold:1500 },
+    { name:'Athens', iata:'ATH', threshold:1400 },
+    { name:'Bangkok', iata:'BKK', threshold:4500 },
+    { name:'Tbilisi', iata:'TBS', threshold:2000 },
+    { name:'Dubrovnik', iata:'DBV', threshold:1600 },
+  ];
+}
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tab + 'Panel').classList.add('active');
+}
+function showStatus(msg) { document.getElementById('statusBar').textContent = msg; }
+function showError(msg) { document.getElementById('errorEl').innerHTML = msg ? `<div class="error-msg">${msg}</div>` : ''; }
+
+function renderWatchlistEditor() {
+  document.getElementById('watchlistRows').innerHTML = state.watchlist.map((d, i) => `
+    <div class="watchlist-row">
+      <input value="${d.name}" placeholder="City" onchange="updateRow(${i},'name',this.value)">
+      <input value="${d.iata}" placeholder="IATA" maxlength="3" style="text-transform:uppercase" onchange="updateRow(${i},'iata',this.value.toUpperCase())">
+      <input type="number" value="${d.threshold}" placeholder="Max DKK" onchange="updateRow(${i},'threshold',+this.value)">
+      <button class="btn-small" onclick="removeRow(${i})">✕</button>
+    </div>`).join('');
+}
+
+function updateRow(i, k, v) { state.watchlist[i][k] = v; save(); }
+function removeRow(i) { state.watchlist.splice(i, 1); save(); renderWatchlistEditor(); }
+function addRow() { state.watchlist.push({ name:'', iata:'', threshold:2000 }); save(); renderWatchlistEditor(); }
+
+async function callProxy(params) {
+  const r = await fetch(API_BASE + '?' + new URLSearchParams(params));
+  if (!r.ok) throw new Error(`Server error ${r.status}`);
+  return r.json();
+}
+
+async function fetchFlightPrice(dest, out, ret) {
+  const data = await callProxy({ engine:'google_flights', departure_id:ORIGIN, arrival_id:dest, outbound_date:out, return_date:ret, currency:'DKK', hl:'en', type:'1' });
+  if (data.error) throw new Error(data.error);
+  const prices = [];
+  for (const k of ['best_flights','other_flights']) for (const f of (data[k]||[])) if (f.price) prices.push(f.price);
+  return prices.length ? Math.min(...prices) : null;
+}
+
+async function fetchDiscovery() {
+  const data = await callProxy({ engine:'google_travel_explore', q:`Flights from ${ORIGIN}`, currency:'DKK', hl:'en' });
+  if (data.error) throw new Error(data.error);
+  return (data.destinations||[]).slice(0,24).map(item => ({ name:item.destination?.name||'—', iata:item.destination?.iata_code||item.destination?.id||'', price:item.price||null, country:item.destination?.country||'' })).filter(d => d.iata && d.price);
+}
+
+function candidateDates() {
+  const pairs = [], today = new Date();
+  for (let d = 7; d <= 60; d += 14) for (const len of [3,5,7]) {
+    const dep = new Date(today); dep.setDate(today.getDate()+d);
+    const ret = new Date(dep);   ret.setDate(dep.getDate()+len);
+    pairs.push([dep.toISOString().slice(0,10), ret.toISOString().slice(0,10)]);
+  }
+  return pairs;
+}
+
+function score(iata, price, threshold) {
+  return Math.max(0, Math.min(60, Math.round((1-price/threshold)*60))) + (EXCITEMENT[iata.toUpperCase()]||5);
+}
+
+function cardHtml(d) {
+  const isDeal = d.price && d.threshold && d.price <= d.threshold;
+  const s = d.score || 0;
+  const bookUrl = `https://www.google.com/flights?q=flights+from+CPH+to+${d.iata}`;
+  let priceHtml = '<span class="price" style="color:var(--muted)">—</span>';
+  if (d.loading) priceHtml = '<span class="spinner"></span>';
+  else if (d.price) priceHtml = `<span class="price ${isDeal?'deal':''}">${d.price.toLocaleString('da-DK')}</span><span class="currency">DKK return</span>`;
+  const saving = isDeal ? d.threshold - d.price : 0;
+  return `<div class="card ${isDeal?'deal':''} ${d.loading?'loading':''}">
+    <div class="card-header">
+      <div><div class="destination">${d.name}</div><div class="iata">${d.iata}${d.country?' · '+d.country:''}</div></div>
+      <span class="badge ${isDeal?'deal':d.type==='discovery'?'discovery':d.loading?'checking':'watch'}">${isDeal?'Deal':d.loading?'…':d.type==='discovery'?'Discovery':'Watching'}</span>
+    </div>
+    <div class="price-row">${priceHtml}</div>
+    ${isDeal?`<div class="saving">Saves ${saving.toLocaleString('da-DK')} DKK vs your limit</div>`:''}
+    ${d.dates&&!d.loading?`<div class="dates">${d.dates}</div>`:''}
+    ${d.threshold&&!d.loading&&!isDeal?`<div class="threshold-line">Your limit: ${d.threshold.toLocaleString('da-DK')} DKK</div>`:''}
+    <div class="card-footer">
+      <div class="score-bar"><div class="score-fill" style="width:${Math.min(100,s)}%"></div></div>
+      <span class="score-label">${s}/100</span>
+      <a href="${bookUrl}" target="_blank" class="btn-book">Search →</a>
+    </div>
+  </div>`;
+}
+
+function renderGrid(id, items) {
+  document.getElementById(id).innerHTML = items.length ? items.map(cardHtml).join('') : '<div class="empty-state">No results yet.</div>';
+}
+
+async function refresh() {
+  showError('');
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  document.getElementById('spinnerEl').style.display = 'inline-block';
+  document.getElementById('refreshLabel').textContent = 'Fetching…';
+
+  const dates = candidateDates();
+  const watchItems = state.watchlist.filter(d => d.iata && d.name).map(d => ({ ...d, loading:true, type:'watchlist', score:0 }));
+  renderGrid('watchlistGrid', watchItems);
+  showStatus('Checking watchlist…');
+
+  for (let i = 0; i < watchItems.length; i++) {
+    const d = watchItems[i];
+    let bestPrice = null, bestDates = null;
+    for (const [out, ret] of dates.slice(0,4)) {
+      try {
+        const p = await fetchFlightPrice(d.iata, out, ret);
+        if (p && (!bestPrice || p < bestPrice)) { bestPrice = p; bestDates = `${out} → ${ret}`; }
+      } catch(e) { console.warn(e); }
+    }
+    watchItems[i] = { ...d, price:bestPrice, dates:bestDates, loading:false, score:bestPrice?score(d.iata,bestPrice,d.threshold):0 };
+    renderGrid('watchlistGrid', [...watchItems]);
+    showStatus(`Checked ${i+1}/${watchItems.length}…`);
+  }
+
+  state.watchResults = watchItems;
+  showStatus('Watchlist done. Discovering…');
+
+  try {
+    const raw = await fetchDiscovery();
+    const watchIatas = new Set(state.watchlist.map(d => d.iata.toUpperCase()));
+    const threshold = 2500;
+    const disc = raw.filter(d => !watchIatas.has(d.iata.toUpperCase()))
+      .map(d => ({ ...d, threshold, type:'discovery', loading:false, score:score(d.iata,d.price,threshold), dates:'Flexible' }))
+      .filter(d => d.score >= 20).sort((a,b) => b.score-a.score).slice(0,12);
+    state.discoverResults = disc;
+    renderGrid('discoveryGrid', disc);
+  } catch(e) { console.warn('Discovery failed:', e); }
+
+  const now = new Date().toLocaleTimeString('da-DK', { hour:'2-digit', minute:'2-digit' });
+  state.lastUpdated = now; save();
+  showStatus(`Last updated ${now}`);
+  btn.disabled = false;
+  document.getElementById('spinnerEl').style.display = 'none';
+  document.getElementById('refreshLabel').textContent = 'Fetch prices';
+}
+
+renderWatchlistEditor();
+if (state.watchResults.length) renderGrid('watchlistGrid', state.watchResults);
+if (state.discoverResults.length) renderGrid('discoveryGrid', state.discoverResults);
+if (state.lastUpdated) showStatus(`Last updated ${state.lastUpdated}`);
+</script>
+</body>
+</html>  .watchlist-row input:focus { border-color: var(--accent); }
+  .btn-small { padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); background: transparent; font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer; }
+  .btn-small:hover { border-color: #c0392b; color: #c0392b; }
+  .btn-add { padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px dashed var(--border); background: transparent; font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer; margin-top: 4px; }
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; transition: border-color 0.15s; }
+  .card:hover { border-color: #c8c0b8; } .card.deal { border-color: #a8d5b8; } .card.loading { opacity: 0.6; }
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem; }
+  .destination { font-family: var(--serif); font-weight: 300; font-size: 1.3rem; color: var(--text); line-height: 1.1; }
+  .iata { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); margin-top: 2px; }
+  .badge { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; white-space: nowrap; }
+  .badge.deal { background: var(--deal-bg); color: var(--deal-color); }
+  .badge.watch { background: var(--tag-bg); color: var(--muted); }
+  .badge.discovery { background: #e8e4f0; color: #4a3a7a; }
+  .badge.checking { background: var(--tag-bg); color: var(--muted); }
+  .price-row { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .price { font-size: 1.6rem; font-weight: 500; color: var(--text); letter-spacing: -0.02em; }
+  .price.deal { color: var(--deal-color); }
+  .currency { font-size: 11px; color: var(--muted); }
+  .saving { font-size: 11px; color: var(--deal-color); margin-bottom: 0.5rem; }
+  .dates { font-size: 11px; color: var(--muted); margin-bottom: 0.75rem; }
+  .threshold-line { font-size: 11px; color: var(--muted); margin-bottom: 0.75rem; }
+  .card-footer { border-top: 1px solid var(--border); padding-top: 0.75rem; display: flex; align-items: center; }
+  .score-bar { height: 3px; background: var(--border); border-radius: 2px; flex: 1; margin-right: 0.75rem; overflow: hidden; }
+  .score-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+  .score-label { font-size: 10px; color: var(--muted); white-space: nowrap; }
+  .btn-book { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--accent); background: transparent; font-family: var(--mono); font-size: 11px; color: var(--accent); text-decoration: none; white-space: nowrap; margin-left: 0.5rem; }
+  .btn-book:hover { background: var(--accent); color: #fff; }
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 12px; }
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-msg { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 0.75rem 1rem; font-size: 12px; color: #991b1b; margin-bottom: 1rem; }
+  .section-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .discovery-note { font-size: 11px; color: var(--muted); margin-bottom: 1rem; line-height: 1.5; }
+  @media (max-width: 600px) { header, main { padding-left: 1rem; padding-right: 1rem; } h1 { font-size: 1.6rem; } .watchlist-row { grid-template-columns: 1fr 70px 80px auto; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="site-label">Flight Scout · Copenhagen CPH</div>
+  <h1>Where should you go <em>next?</em></h1>
+  <p class="subtitle">Live flight prices · refreshes on demand</p>
+  <div class="controls">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('watchlist', this)">Watchlist</button>
+      <button class="tab" onclick="switchTab('discovery', this)">Discoveries</button>
+    </div>
+    <button class="btn-refresh" id="refreshBtn" onclick="refresh()">
+      <span id="spinnerEl" style="display:none" class="spinner"></span>
+      <span id="refreshLabel">Fetch prices</span>
+    </button>
+    <span class="status-bar" id="statusBar">—</span>
+  </div>
+</header>
+<main>
+  <div id="errorEl"></div>
+  <div class="panel active" id="watchlistPanel">
+    <div class="watchlist-editor">
+      <h3>Your watchlist</h3>
+      <div id="watchlistRows"></div>
+      <button class="btn-add" onclick="addRow()">+ Add destination</button>
+    </div>
+    <div class="section-label">Current prices</div>
+    <div class="grid" id="watchlistGrid"><div class="empty-state">Add destinations above, then click "Fetch prices"</div></div>
+  </div>
+  <div class="panel" id="discoveryPanel">
+    <p class="discovery-note">Best-value destinations from CPH right now — ranked by price vs excitement. Click "Fetch prices" to refresh.</p>
+    <div class="section-label">Top deals right now</div>
+    <div class="grid" id="discoveryGrid"><div class="empty-state">Click "Fetch prices" to discover deals</div></div>
+  </div>
+</main>
+<script>
+// ── Set this to your Vercel URL after deploying ──
 const API_BASE = 'https://YOUR-PROJECT.vercel.app/api/flights';
 
 const ORIGIN = 'CPH';
